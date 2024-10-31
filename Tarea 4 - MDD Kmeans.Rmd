@@ -1,0 +1,44 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+plot(cars)
+
+install.packages("arules")
+library(arules)
+library(dplyr)
+
+data <- read.csv('C:\\Users\\jerdu\\Downloads\\db_csv_\\db_csv_\\PERSONA_BDP.csv', sep=",")
+
+
+reglas <- apriori(data[,!names(data) %in% c("PEA", "POCUPA", "PEI", "Long", "Lat", "COD_MUNICIPIO", "PCP5", "NUM_HOGAR", "NUM_VIVIENDA", "RESCINGEO", "PCP33","PCP38_A","PCP38_B","PCP38_C", "PDESOC", "LUGNACGEO", "LUGAR_POBLADO" )],                            parameter = list(support=0.20, confidence=0.5 ))
+
+#REGLA 1
+inspect(reglas[300:500][127])
+
+data2 <- data[, names(data) %in% c('PCP11_B', 'PCP12')]
+data3 <- data2 %>% 
+            filter(!is.na(PCP11_B))
+
+cluster <- kmeans(data3, centers=3)
+
+sum(is.na(data3$PCP11_B))
+
+install.packages("ggplot2")
+library(ggplot2)
+
+ggplot(data3, aes(x = PCP11_B, y = PCP12, color = as.factor(cluster$cluster)))+
+  geom_point()+
+  geom_point(data = as.data.frame(cluster$centers), aes(x=PCP11_B, y = PCP12), color = "black", size=4, shape=17)+
+  labs(title = "Departamento vs ¿Cómo se identifica?")+
+  theme_minimal()
+
+
+```
+
+
+
